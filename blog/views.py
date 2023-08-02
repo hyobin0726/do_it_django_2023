@@ -1,4 +1,4 @@
-
+from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 from .models import Post
 
@@ -6,6 +6,7 @@ from .models import Post
 class PostList(ListView):
     model = Post
     ordering = '-pk'
+
 
 class PostDetail(DetailView):
     model = Post
@@ -15,7 +16,7 @@ class PostDetail(DetailView):
 #
 #     return render(
 #         request,
-
+#         'blog/index.html',
 #         {
 #             'posts': posts,
 #         }
@@ -27,7 +28,7 @@ class PostDetail(DetailView):
 #
 #     return render(
 #         request,
-
+#         'blog/single_post_page.html',
 #         {
 #             'post': post,
 #         }
