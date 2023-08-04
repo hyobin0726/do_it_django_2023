@@ -10,6 +10,9 @@ class TestView(TestCase):
         self.user_ahyobin = User.objects.create_user(username='ahyobin',password = 'somepassword')
         self.user_bhyobin = User.objects.create_user(username='bhyobin', password='somepassword')
 
+        self.user_bhyobin.is_staff = True
+        self.user_bhyobin.save()
+
         self.category_cafe = Category.objects.create(name='cafe', slug='cafe')
         self.category_cooking = Category.objects.create(name='cooking', slug='cooking')
 
@@ -176,3 +179,39 @@ class TestView(TestCase):
         self.assertIn(self.post_001.title, main_area.text)
         self.assertNotIn(self.post_002.title, main_area.text)
         self.assertNotIn(self.post_003.title, main_area.text)
+
+    def test_create_post(self):
+        # 로그인 하지 않으면 status code가 200이면 안된다!
+        response = self.client.get('/blog/create_post/')
+        self.assertNotEqual(response.status_code, 200)
+
+        # staff가 아닌 trum가 로그인을 한다.
+        self.client.login(username='ahyobin', password='somepassword')
+        response = self.client.get('/blog/create_post/')
+        self.assertNotEqual(response.status_code, 200)
+
+        #bhyobin로 로그인한다.
+        self.client.login(username='bhyobin', password='somepassword')
+
+        response = self.client.get('/blog/create_post/')
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        self.assertEqual('Create Post - Blog', soup.title.text)
+        main_area = soup.find('div', id='main-area')
+        self.assertIn('Create New Post', main_area.text)
+
+        self.client.post(
+            '/blog/create_post/',
+            {
+                'title': 'Post Form 만들기',
+                'content': "Post Form 페이지를 만듭시다.",
+            }
+        )
+        last_post = Post.objects.last()
+        self.assertEqual(last_post.title, "Post Form 만들기")
+        self.assertEqual(last_post.author.username, 'bhyobin')
+
+
+
+
