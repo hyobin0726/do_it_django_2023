@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.utils.text import slugify
 from .models import Post, Category, Tag
 from django.core.exceptions import PermissionDenied
-from django.utils.text import slugify
+
 
 class PostList(ListView):
     model = Post
@@ -24,9 +25,12 @@ class PostDetail(DetailView):
         context['categories'] = Category.objects.all()
         context['no_category_post_count'] = Post.objects.filter(category=None).count()
         return context
-class PostCreate(LoginRequiredMixin,UserPassesTestMixin, CreateView):
+
+
+class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = Post
     fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']
+
     def test_func(self):
         return self.request.user.is_superuser or self.request.user.is_staff
 
@@ -55,6 +59,8 @@ class PostCreate(LoginRequiredMixin,UserPassesTestMixin, CreateView):
 
         else:
             return redirect('/blog/')
+
+
 class PostUpdate(LoginRequiredMixin, UpdateView):
     model = Post
     fields = ['title', 'hook_text', 'content', 'head_image', 'file_upload', 'category']
@@ -97,6 +103,7 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
 
         return response
 
+
 def category_page(request, slug):
     if slug == 'no_category':
         category = '미분류'
@@ -104,7 +111,6 @@ def category_page(request, slug):
     else:
         category = Category.objects.get(slug=slug)
         post_list = Post.objects.filter(category=category)
-
 
     return render(
         request,
@@ -117,10 +123,10 @@ def category_page(request, slug):
         }
     )
 
+
 def tag_page(request, slug):
     tag = Tag.objects.get(slug=slug)
     post_list = tag.post_set.all()
-
 
     return render(
         request,
@@ -132,7 +138,6 @@ def tag_page(request, slug):
             'no_category_post_count': Post.objects.filter(category=None).count(),
         }
     )
-
 
 # def index(request):
 #     posts = Post.objects.all().order_by('-pk')
