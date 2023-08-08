@@ -54,7 +54,7 @@ class TestView(TestCase):
         self.assertIn('Blog', navbar.text)
         self.assertIn('About Me', navbar.text)
 
-        logo_btn = navbar.find('a', text='Do It Django')
+        logo_btn = navbar.find('a', text='hyobin web site')
         self.assertEqual(logo_btn.attrs['href'], '/')
 
         home_btn = navbar.find('a', text='Home')
@@ -350,33 +350,6 @@ class TestView(TestCase):
             self.assertFalse(comment_area.find('a', id='comment-2-update-btn'))
 
             # 로그인 한 상태
-            self.client.login(username='obama', password='somepassword')
-            response = self.client.get(self.post_001.get_absolute_url())
-            self.assertEqual(response.status_code, 200)
-            soup = BeautifulSoup(response.content, 'html.parser')
-
-            comment_area = soup.find('div', id='comment-area')
-            self.assertFalse(comment_area.find('a', id='comment-2-update-btn'))
-            comment_001_update_btn = comment_area.find('a', id='comment-1-update-btn')
-            self.assertIn('edit', comment_001_update_btn.text)
-            self.assertEqual(comment_001_update_btn.attrs['href'], '/blog/update_comment/1/')
-
-        def test_comment_update(self):
-            comment_by_trump = Comment.objects.create(
-                post=self.post_001,
-                author=self.user_ahyobin,
-                content='효빈의 댓글입니다.'
-            )
-
-            response = self.client.get(self.post_001.get_absolute_url())
-            self.assertEqual(response.status_code, 200)
-            soup = BeautifulSoup(response.content, 'html.parser')
-
-            comment_area = soup.find('div', id='comment-area')
-            self.assertFalse(comment_area.find('a', id='comment-1-update-btn'))
-            self.assertFalse(comment_area.find('a', id='comment-2-update-btn'))
-
-            # 로그인 한 상태
             self.client.login(username='bhyobin', password='somepassword')
             response = self.client.get(self.post_001.get_absolute_url())
             self.assertEqual(response.status_code, 200)
@@ -387,6 +360,7 @@ class TestView(TestCase):
             comment_001_update_btn = comment_area.find('a', id='comment-1-update-btn')
             self.assertIn('edit', comment_001_update_btn.text)
             self.assertEqual(comment_001_update_btn.attrs['href'], '/blog/update_comment/1/')
+
 
             response = self.client.get('/blog/update_comment/1/')
             self.assertEqual(response.status_code, 200)
