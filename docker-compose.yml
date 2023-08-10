@@ -1,30 +1,40 @@
 version: '3'
 
 services:
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_volume:/usr/src/app/_static
+      - media_volume:/usr/src/app/_media
+    ports:
+      - 80:80
+    depends_on:
+      - web
+
   web:
     build: .
     command: gunicorn do_it_django_prj.wsgi:application --bind 0.0.0.0:8000
     volumes:
+      - static_volume://usr/src/app/_static
+      - media_volume:/usr/src/app/_media
       - ./:/usr/src/app/
-    ports:
-      - 8000:8000
+    expose:
+      - 8000
     env_file:
       - ./.env.prod
 
     depends_on:
       - db
-    networks:
-      - mynetwork  # 네트워크 설정을 추가한 부분
+
   db:
     image : postgres:12.0-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - ./.env.prod.db
-    networks:
-      - mynetwork  # 네트워크 설정을 추가한 부분
-networks:
-  mynetwork:  # 네트워크 설정을 추가한 부분
-    external: true
+
+
 volumes:
   postgres_data:
+  static_volume:
+  media_volume:
