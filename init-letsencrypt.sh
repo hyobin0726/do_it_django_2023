@@ -71,6 +71,7 @@ docker-compose run --rm --entrypoint "\
     $staging_arg \
     $email_arg \
     $domain_args \
+    --key-type rsa \
     --rsa-key-size $rsa_key_size \
     --agree-tos \
     --force-renewal" certbot
